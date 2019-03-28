@@ -50,7 +50,7 @@ test_gen = test_datagen.flow_from_directory(
         class_mode='binary',
         shuffle=False)
 
-# base modelの重みは更新しない
+# base modelの重みは更新しない(FC層のみ学習)
 for layer in base_model.layers:
     layer.trainable = False
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
@@ -74,7 +74,7 @@ plt.legend()
 plt.show()
 
 # 全ての重みを更新
-for layer in model_cls.layers:
+for layer in model.layers:
     layer.trainable = True
 model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='binary_crossentropy', metrics=['acc'])
 callbacks = []
