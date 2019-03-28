@@ -2,7 +2,7 @@ import os, shutil
 from glob import glob
 import numpy as np
 
-base_dir = 'dataset'
+base_dir = 'downsampling'
 train_ratio = 0.8
 
 # make train directory
