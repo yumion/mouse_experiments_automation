@@ -49,5 +49,5 @@ cls_1_name = [os.path.basename(f) for f in cls_1]
 for i in range(len(cls_1)):
     if cls_1_name[i] in cls_0_name:
         rm_file = cls_0[cls_0_name.index(cls_1_name[i])]
-        print(rm_file)
-        # os.remove(rm_file)
+        # print(rm_file)
+        os.remove(rm_file)

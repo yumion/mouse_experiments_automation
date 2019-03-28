@@ -10,15 +10,13 @@ from keras.applications.vgg19 import VGG19
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
 
-# クラス数
-num_classes = 2
 
 # ImageDataGenerator
 train_datagen = ImageDataGenerator(
             rescale=1./255,
-            rotation_range=40,
+            rotation_range=90,
             horizontal_flip=True,
-            fill_mode='nearest')
+            fill_mode='constant')
 
 test_datagen = ImageDataGenerator(rescale=1./255)
 
@@ -31,10 +29,9 @@ x = Dense(1024, activation='relu')(x)
 x = Dropout(0.25)(x)
 x = Dense(128, activation='relu')(x)
 x = Dropout(0.5)(x)
-classification = Dense(num_classes, activation='sigmoid', name='classification')(x)
+classification = Dense(1, activation='sigmoid', name='classification')(x)
 # model
 model = Model(inputs=base_model.input, outputs=classification)
-model.summary()
 
 # data読み込み
 train_gen = train_datagen.flow_from_directory(
@@ -53,9 +50,10 @@ test_gen = test_datagen.flow_from_directory(
 # base modelの重みは更新しない(FC層のみ学習)
 for layer in base_model.layers:
     layer.trainable = False
+model.summary()
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 callbacks = []
-callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=False))
+callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
 history = model.fit_generator(train_gen,
                 steps_per_epoch=len(train_gen),
                 validation_data=test_gen,
@@ -76,9 +74,10 @@ plt.show()
 # 全ての重みを更新
 for layer in model.layers:
     layer.trainable = True
+model.summary()
 model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='binary_crossentropy', metrics=['acc'])
 callbacks = []
-callbacks.append(ModelCheckpoint(filepath='model_weights_add_train.h5', save_best_only=True, save_weights_only=False))
+callbacks.append(ModelCheckpoint(filepath='model_weights_add_train.h5', save_best_only=True, save_weights_only=True))
 history_add = model.fit_generator(train_gen,
                 steps_per_epoch=len(train_gen),
                 validation_data=test_gen,
