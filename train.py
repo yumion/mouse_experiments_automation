@@ -69,7 +69,8 @@ history = model.fit_generator(train_gen,
                 steps_per_epoch=len(train_gen),
                 validation_data=test_gen,
                 validation_steps=len(test_gen),
-                epochs=30,
+                epochs=100,
+                callbacks=callbacks,
                 shuffle=True
                 )
 # 途中結果を表示
@@ -82,6 +83,7 @@ plt.ylabel('accuracy')
 plt.legend()
 plt.show()
 
+
 # 全ての重みを更新
 for layer in model.layers:
     layer.trainable = True
@@ -93,6 +95,7 @@ history_add = model.fit_generator(train_gen,
                 validation_data=test_gen,
                 validation_steps=len(test_gen),
                 epochs=100,
+                callbacks=callbakcs,
                 shuffle=True
                 )
 
