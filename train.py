@@ -30,30 +30,31 @@ x = Dense(1024, activation='relu')(x)
 x = Dropout(0.25)(x)
 x = Dense(128, activation='relu')(x)
 x = Dropout(0.5)(x)
-classification = Dense(1, activation='sigmoid', name='classification')(x)
+classification = Dense(2, activation='softmax', name='classification')(x)
 # model
 model = Model(inputs=base_model.input, outputs=classification)
 model.summary()
 
 # data読み込み
-train_gen = train_datagen.flow_from_directory(
+train_gen = test_datagen.flow_from_directory(
         'downsampling/train',
         target_size=(320, 240),
         batch_size=32,
-        class_mode='binary',
+        class_mode='categorical',
         shuffle=False)
 
 test_gen = test_datagen.flow_from_directory(
         'downsampling/test',
         target_size=(320, 240),
         batch_size=32,
-        class_mode='binary',
+        class_mode='categorical',
         shuffle=False)
 
+'''
 # base modelの重みは更新しない(FC層のみ学習)
 for layer in base_model.layers:
     layer.trainable = False
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
 history = model.fit_generator(train_gen,
@@ -73,12 +74,12 @@ plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
-
+'''
 
 # 全ての重みを更新
 for layer in model.layers:
     layer.trainable = True
-model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='binary_crossentropy', metrics=['acc'])
+model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights_add_train.h5', save_best_only=True, save_weights_only=True))
 history_add = model.fit_generator(train_gen,
