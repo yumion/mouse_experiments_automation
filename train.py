@@ -30,15 +30,6 @@ x = Dense(1024, activation='relu')(x)
 x = Dropout(0.25)(x)
 x = Dense(128, activation='relu')(x)
 x = Dropout(0.5)(x)
-'''LSTM
-from keras.layers import LSTM, Reshape
-base_model = Xception(weights='imagenet', include_top=False)
-x = base_model.output
-x = GlobalAveragePooling2D()(x)
-x = Reshape((-1,1))(x)
-x = LSTM(128)(x)
-x = Dropout(0.5)(x)
-'''
 classification = Dense(1, activation='sigmoid', name='classification')(x)
 # model
 model = Model(inputs=base_model.input, outputs=classification)
@@ -48,14 +39,14 @@ model.summary()
 train_gen = train_datagen.flow_from_directory(
         'downsampling/train',
         target_size=(320, 240),
-        batch_size=128,
+        batch_size=32,
         class_mode='binary',
         shuffle=False)
 
 test_gen = test_datagen.flow_from_directory(
         'downsampling/test',
         target_size=(320, 240),
-        batch_size=128,
+        batch_size=32,
         class_mode='binary',
         shuffle=False)
 
@@ -95,7 +86,7 @@ history_add = model.fit_generator(train_gen,
                 validation_data=test_gen,
                 validation_steps=len(test_gen),
                 epochs=100,
-                callbacks=callbakcs,
+                callbacks=callbacks,
                 shuffle=True
                 )
 
