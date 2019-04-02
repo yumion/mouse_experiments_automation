@@ -31,23 +31,12 @@ frames_time = [os.path.splitext(f)[0] for f in frames_time] # 拡張子を取り
 frames_time = [time_to_sec(f) for f in frames_time] # 入力データ
 
 # 穴掘り時間のフレームをラベリング
-for st, et in zip(start_time, end_time): # まず穴掘り時間を定めて
-    for idx, fs in enumerate(frames_time): # 該当するフレームを検索
-        if st <= fs and et >= fs: # 穴掘りしている時間
-            cls_dir = os.path.join('dataset/1', os.path.basename(frames_file[idx]))
-            shutil.copyfile(frames_file[idx], cls_dir)
-        else: # その他の時間
-            cls_dir = os.path.join('dataset/0', os.path.basename(frames_file[idx]))
-            shutil.copyfile(frames_file[idx], cls_dir)
-
-
-# なぜか０フォルダにも１フォルダの画像がコピーされたので、重複を消す
-cls_0 = sorted(glob('dataset/0/*'))
-cls_0_name = [os.path.basename(f) for f in cls_0]
-cls_1 = sorted(glob('dataset/1/*'))
-cls_1_name = [os.path.basename(f) for f in cls_1]
-for i in range(len(cls_1)):
-    if cls_1_name[i] in cls_0_name:
-        rm_file = cls_0[cls_0_name.index(cls_1_name[i])]
-        # print(rm_file)
-        os.remove(rm_file)
+with open('annotation_NS38.csv', 'w') as f:
+    f.write('frame,class\n')
+    for st, et in zip(start_time, end_time): # まず穴掘り時間を定めて
+        for i, ft in enumerate(frames_time): # 該当するフレームを検索
+            if st <= ft and et >= ft: # 穴掘りしている時間
+                cls_idx = '1'
+            else: # その他の時間
+                cls_idx = '0'
+            f.write(frames_file[i]+','+cls_idx+'\n')
