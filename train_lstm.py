@@ -1,11 +1,11 @@
 from glob import glob
 import matplotlib.pyplot as plt
-from keras.models import Model
-from keras.layers import Dense, Dropout, GlobalAveragePooling2D
+from keras.models import Model, Sequential
+from keras.layers import Dense, Dropout, GlobalAveragePooling2D, LSTM, Input, Reshape, Flatten
+from keras.layers.wrappers import TimeDistributed
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import SGD
 from keras.preprocessing.image import ImageDataGenerator
-
 
 # ImageDataGenerator
 train_datagen = ImageDataGenerator(
@@ -23,38 +23,39 @@ test_datagen = ImageDataGenerator(rescale=1./255)
 # VGG
 from keras.applications.vgg19 import VGG19
 base_model = VGG19(weights='imagenet', include_top=False)
-# add layers
-x = base_model.output
-x = GlobalAveragePooling2D()(x)
-x = Dense(1024, activation='relu')(x)
-x = Dropout(0.25)(x)
-x = Dense(128, activation='relu')(x)
+# LSTM
+video_input = Input(shape=(30, 320, 240, 3))
+x = TimeDistributed(base_model)(video_input)
+x = TimeDistributed(Flatten())(x)
+x = Dense(512, activation='relu')(x)
+x = LSTM(128, return_sequences=True)(x)
 x = Dropout(0.5)(x)
-classification = Dense(2, activation='softmax', name='classification')(x)
+x = Flatten()(x)
+x = Dense(32, activation='relu')(x)
+classification = Dense(1, activation='sigmoid', name='classification')(x)
 # model
-model = Model(inputs=base_model.input, outputs=classification)
+model = Model(inputs=video_input, outputs=classification)
 model.summary()
 
 # data読み込み
-train_gen = test_datagen.flow_from_directory(
+train_gen = train_datagen.flow_from_directory(
         'downsampling/train',
         target_size=(320, 240),
-        batch_size=32,
-        class_mode='categorical',
+        batch_size=128,
+        class_mode='binary',
         shuffle=False)
 
 test_gen = test_datagen.flow_from_directory(
         'downsampling/test',
         target_size=(320, 240),
-        batch_size=32,
-        class_mode='categorical',
+        batch_size=128,
+        class_mode='binary',
         shuffle=False)
 
-'''
 # base modelの重みは更新しない(FC層のみ学習)
 for layer in base_model.layers:
     layer.trainable = False
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
 history = model.fit_generator(train_gen,
@@ -74,12 +75,12 @@ plt.xlabel('epochs')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
-'''
+
 
 # 全ての重みを更新
 for layer in model.layers:
     layer.trainable = True
-model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='categorical_crossentropy', metrics=['acc'])
+model.compile(optimizer=SGD(lr=0.0001, momentum=0.9), loss='binary_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights_add_train.h5', save_best_only=True, save_weights_only=True))
 history_add = model.fit_generator(train_gen,
@@ -87,7 +88,7 @@ history_add = model.fit_generator(train_gen,
                 validation_data=test_gen,
                 validation_steps=len(test_gen),
                 epochs=100,
-                callbacks=callbacks,
+                callbacks=callbakcs,
                 shuffle=True
                 )
 

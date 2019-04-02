@@ -2,7 +2,8 @@ import os, shutil
 from glob import glob
 import numpy as np
 
-base_dir = 'dataset'
+base_dir = 'downsampling'
+train_ratio = 0.8
 
 # make train directory
 train_dir = os.path.join(base_dir, 'train')
@@ -24,11 +25,11 @@ for clsname in clsnames:
 # move datset to train/test
 for clsname in clsnames:
     fnames = glob('{parent}/{clsname}/*'.format(parent=base_dir, clsname=clsname))
-    np.random.shuffle(fnames)
+    np.random.shuffle(fnames) # 学習データをシャッフル
     fnames = [fname.split(base_dir+'/')[-1] for fname in fnames]
     # number of train
     num_data = len(glob(base_dir+'/{}/*'.format(clsname)))
-    train_size = int(num_data*0.9)
+    train_size = int(num_data * train_ratio)
     # train
     for fname in fnames[:train_size]:
         src = os.path.join(base_dir, fname)
