@@ -31,14 +31,14 @@ frames_time = [os.path.splitext(f)[0] for f in frames_time] # 拡張子を取り
 frames_time = [time_to_sec(f) for f in frames_time] # 入力データ
 
 # 穴掘り時間のフレームをラベリング
-for i, ft in enumerate(frames_time): # まずフレームを固定して
-    for st, et in zip(start_time, end_time): # 穴掘り時間に該当するか探す
+for st, et in zip(start_time, end_time): # まず穴掘り時間を固定して
+    for i, ft in enumerate(frames_time): # 該当するフレームを探す
         if st <= ft and et >= ft: # 穴掘りしている時間
             cls_dir = os.path.join('dataset/1', os.path.basename(frames_file[i]))
+            shutil.copyfile(frames_file[i], cls_dir)
         else: # その他の時間
             cls_dir = os.path.join('dataset/0', os.path.basename(frames_file[i]))
-        shutil.copyfile(frames_file[i], cls_dir) # フレームごとに保存するためにこの位置で
-
+            shutil.copyfile(frames_file[i], cls_dir)
 
 # ０フォルダにも１フォルダの画像がコピーされたので、重複を消す
 cls_0 = sorted(glob('dataset/0/*'))
