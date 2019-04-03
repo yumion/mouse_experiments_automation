@@ -33,10 +33,10 @@ frames_time = [time_to_sec(f) for f in frames_time] # 入力データ
 # 穴掘り時間のフレームをラベリング
 with open('annotation_NS38.csv', 'w') as f:
     f.write('frame,class\n')
-    for st, et in zip(start_time, end_time): # まず穴掘り時間を定めて
-        for i, ft in enumerate(frames_time): # 該当するフレームを検索
+    for i, ft in enumerate(frames_time): # まずフレームを固定して
+        for st, et in zip(start_time, end_time): # 穴掘り時間に該当するか探してラベリング
             if st <= ft and et >= ft: # 穴掘りしている時間
                 cls_idx = '1'
             else: # その他の時間
                 cls_idx = '0'
-            f.write(frames_file[i]+','+cls_idx+'\n')
+        f.write(frames_file[i]+','+cls_idx+'\n')

@@ -2,7 +2,7 @@ import cv2
 import os
 
 ## パスを指定 ##
-video_path = "データ/200170616_BT_NS_038.m4v"
+video_path = "raw_data/200170616_BT_NS_038/200170616_BT_NS_038.m4v"
 ####
 
 cap = cv2.VideoCapture(video_path)
@@ -26,9 +26,9 @@ while(cap.isOpened()):
     time_sec = total_sec - time_min*60
     # 保存
     if ret == True:
-        output_path = os.path.join(video_path.split('.')[0], "{0:02}-{1:.2f}.jpg".format(time_min, time_sec))
+        output_path = os.path.join(video_path.split('.')[0], "{0:02}-{1:05.2f}.jpg".format(time_min, time_sec))
         cv2.imwrite(output_path, frame)
-        print("save {0:02}-{1:.2f}.jpg".format(time_min, time_sec))
+        # print("save {0:02}-{1:05.2f}.jpg".format(time_min, time_sec))
         num += 1
     else:
         break
