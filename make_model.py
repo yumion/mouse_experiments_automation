@@ -30,4 +30,5 @@ def make_model(nb_classes, frame_per_batch, width, height, back_bone='VGG19', tr
     for layer in base_model.layers:
         layer.trainable = train_bottom
     model.summary()
+
     return model

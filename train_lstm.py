@@ -9,23 +9,24 @@ from make_model import make_model
 
 
 train_data_path = 'annotation_NS38.csv'
+nb_classes = 2
 
-batch_size = 16
+batch_size = 8
+nb_frames = 10
 num_images = len(pd.read_csv(train_data_path).values)
 steps_per_epoch = num_images // batch_size
 
 # data読み込み
 train_gen = flow_from_csv(train_data_path,
                             batch_size=batch_size,
-                            nb_classes=2,
+                            nb_classes=nb_classes,
                             target_size=[320, 240],
-                            dimension=3,
-                            nb_frames=30,
+                            nb_frames=nb_frames,
                             shuffle=False)
 
 
 # FC層のみ学習
-model = make_model(2, 30, 320, 240, 'VGG19', train_bottom=False)
+model = make_model(nb_classes, nb_frames, 320, 240, 'VGG19', train_bottom=False)
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
