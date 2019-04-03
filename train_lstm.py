@@ -1,4 +1,5 @@
-from glob import glob
+import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import SGD
@@ -7,13 +8,21 @@ from flow_from_csv import flow_from_csv
 from make_model import make_model
 
 
-batch_size = 32
-num_images = len(glob('raw_data/200170616_BT_NS_038/frames/*'))
+train_data_path = 'annotation_NS38.csv'
+
+batch_size = 16
+num_images = len(pd.read_csv(train_data_path).values)
 steps_per_epoch = num_images // batch_size
 
 # data読み込み
-train_gen = flow_from_csv('annotation_NS38.csv', batch_size=batch_size, nb_classes=2, target_size=[320, 240], shuffle=False)
-# test_gen = flow_from_csv('annotation_NS38.csv', batch_size=, nb_classes=2, target_size=[320, 240], shuffle=False)
+train_gen = flow_from_csv(train_data_path,
+                            batch_size=batch_size,
+                            nb_classes=2,
+                            target_size=[320, 240],
+                            dimension=3,
+                            nb_frames=30,
+                            shuffle=False)
+
 
 # FC層のみ学習
 model = make_model(2, 30, 320, 240, 'VGG19', train_bottom=False)
