@@ -3,16 +3,25 @@ from glob import glob
 import os
 import shutil
 
+# パスを指定
+# csv_dir_path = 'raw_data/digtime_over3sec'
+# frame_dir_path = 'raw_data/convert/frames'
+
+
+# label_csvs = glob(csv_dir_path+'/*')
+# label_csvs[0]
 
 # 教師ラベル
-df = pd.read_csv('raw_data/200170616_BT_NS_038/digtime_NS38.csv')
+df = pd.read_csv(label_csv)
 start_time = df['start'].to_list()
 end_time = df['end'].to_list()
 
 # 入力データ
-frames_file = glob('raw_data/200170616_BT_NS_038/frames/*')
-frames_file = sorted(frames_file)
+# label_csv_basename = os.path.basename(label_csvs[0]).split('.')[0]
+# frames_file = glob('*_'+label_csv_basename+'*/frames/*')
 
+frames_file = sorted(frames_file)
+frames_file
 def time_to_sec(time):
     '''時刻を秒数へ変換'''
     if ':' in time: # excel表記
