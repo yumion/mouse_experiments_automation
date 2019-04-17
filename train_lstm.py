@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import SGD
+from keras.utils.training_utils import multi_gpu_model
 # 自作関数
 from flow_from_csv import flow_from_csv
 from make_model import make_model
@@ -11,8 +12,9 @@ from make_model import make_model
 train_data_path = 'annotation_all_over3sec_train.csv'
 test_data_path = 'annotation_all_over3sec_test.csv'
 
+gpu_count = 3
 nb_classes = 2
-batch_size = 8
+batch_size = 8 * gpu_count
 nb_frames = 10 # 時系列解析で何フレーム見るか
 # training
 train_num_images = len(pd.read_csv(train_data_path).values)
@@ -39,6 +41,7 @@ test_gen = flow_from_csv(test_data_path,
 
 # FC層のみ学習
 model = make_model(nb_classes, nb_frames, 320, 240, 'VGG19', train_bottom=False)
+model = multi_gpu_model(model, gpus=gpu_count) # マルチGPU使用
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
