@@ -14,9 +14,9 @@ split_rate = 0.9
 
 
 # 保存ファイル生成
-with open(savename+'train.csv', 'w') as f:
+with open(savename+'_train.csv', 'w') as f:
     f.write('frame,class\n')
-with open(savename+'test.csv', 'w') as f:
+with open(savename+'_test.csv', 'w') as f:
     f.write('frame,class\n')
 
 # 全サンプルのdigtime.csv読み込み
@@ -68,8 +68,12 @@ def annotation_from_csv(label_csv, savename): # trainとtestに同じ作業を�
                 f.write(frames_file[i]+','+cls_idx+'\n')
 
 # train
+print('train')
 for label_csv in label_csvs_train:
-    annotation_from_csv(label_csv, savename+'train.csv')
+    print(label_csv)
+    annotation_from_csv(label_csv, savename+'_train.csv')
 # test
+print('test')
 for label_csv in label_csvs_test:
-    annotation_from_csv(label_csv, savename+'train.csv')
+    print(label_csv)
+    annotation_from_csv(label_csv, savename+'_test.csv')
