@@ -7,17 +7,29 @@ from keras.optimizers import SGD
 from flow_from_csv import flow_from_csv
 from make_model import make_model
 
+# annotaoinのパス
+train_data_path = 'annotation_all_over3sec_train.csv'
+test_data_path = 'annotation_all_over3sec_test.csv'
 
-train_data_path = 'annotation_NS38.csv'
 nb_classes = 2
-
 batch_size = 8
-nb_frames = 10
-num_images = len(pd.read_csv(train_data_path).values)
-steps_per_epoch = num_images // batch_size
+nb_frames = 10 # 時系列解析で何フレーム見るか
+# training
+train_num_images = len(pd.read_csv(train_data_path).values)
+train_steps_per_epoch = train_num_images // batch_size
+# validation
+test_num_images = len(pd.read_csv(test_data_path).values)
+test_steps_per_epoch = test_num_images // batch_size
 
 # data読み込み
 train_gen = flow_from_csv(train_data_path,
+                            batch_size=batch_size,
+                            nb_classes=nb_classes,
+                            target_size=[320, 240],
+                            nb_frames=nb_frames,
+                            shuffle=False)
+
+test_gen = flow_from_csv(test_data_path,
                             batch_size=batch_size,
                             nb_classes=nb_classes,
                             target_size=[320, 240],
@@ -31,9 +43,11 @@ model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc']
 callbacks = []
 callbacks.append(ModelCheckpoint(filepath='model_weights.h5', save_best_only=True, save_weights_only=True))
 history = model.fit_generator(train_gen,
-                steps_per_epoch=steps_per_epoch,
+                steps_per_epoch=train_steps_per_epoch,
                 epochs=30,
                 callbacks=callbacks,
+                validation_data=test_gen,
+                validation_steps=test_steps_per_epoch,
                 shuffle=False)
 
 # 途中結果を表示
