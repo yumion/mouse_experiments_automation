@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import SGD
-from keras.utils.training_utils import multi_gpu_model
+from keras.utils import multi_gpu_model
 # 自作関数
 from flow_from_csv import flow_from_csv
 from make_model import make_model
